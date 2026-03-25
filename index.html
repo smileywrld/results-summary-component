@@ -1,56 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- displays site properly based on user's device -->
-
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
-
   <title>Frontend Mentor | Results summary component</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap"
-    rel="stylesheet">
-
-  <!-- Feel free to remove these styles or customise in your own stylesheet 👍 -->
-  <style>
-    .attribution {
-      font-size: 11px;
-      text-align: center;
-    }
-
-    .attribution a {
-      color: hsl(228, 45%, 44%);
-    }
-  </style>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <main class="page">
+    <article class="card">
+      <section class="result-panel">
+        <h1 class="result-panel__label">Your Result</h1>
+        <div class="score-circle" aria-label="Score 76 out of 100">
+          <span class="score-circle__value">76</span>
+          <span class="score-circle__total">of 100</span>
+        </div>
+        <div class="result-panel__content">
+          <h2 class="result-panel__title">Great</h2>
+          <p class="result-panel__text">
+            You scored higher than 65% of the people who have taken these tests.
+          </p>
+        </div>
+      </section>
 
-  <main id="container">
-    <div class="flex-item-1">
-      <p>Your Results</p>
-      <div class="circle">
-        <h1>76</h1>
-        <p>of 100</p>
-      </div>
-      <p>You scored higher than 65% of the people who have taken these tests.</p>
-    </div>
-
-    <div class="flex-item">
-
-    </div>
+      <section class="summary-panel" aria-labelledby="summary-title">
+        <h2 class="summary-panel__title" id="summary-title">Summary</h2>
+        <ul class="summary-list" id="summary-list"></ul>
+        <button class="continue-button" type="button">Continue</button>
+      </section>
+    </article>
   </main>
 
-
   <div class="attribution">
-    Challenge by <a href="https://www.frontendmentor.io?ref=challenge" target="_blank">Frontend Mentor</a>.
-    Coded by <a href="#">Your Name Here</a>.
+    Challenge by <a href="https://www.frontendmentor.io?ref=challenge" target="_blank" rel="noreferrer">Frontend Mentor</a>.
+    Coded by <a href="#">SmyLey</a>.
   </div>
-</body>
 
+  <script>
+    const categoryClassMap = {
+      Reaction: "reaction",
+      Memory: "memory",
+      Verbal: "verbal",
+      Visual: "visual"
+    };
+
+    async function renderSummary() {
+      const summaryList = document.getElementById("summary-list");
+
+      try {
+        const response = await fetch("./data.json");
+        const items = await response.json();
+
+        summaryList.innerHTML = items
+          .map((item) => {
+            const toneClass = categoryClassMap[item.category] || "default";
+
+            return `
+              <li class="summary-item summary-item--${toneClass}">
+                <div class="summary-item__category">
+                  <img src="${item.icon}" alt="" aria-hidden="true">
+                  <span>${item.category}</span>
+                </div>
+                <p class="summary-item__score">
+                  <strong>${item.score}</strong>
+                  <span>/ 100</span>
+                </p>
+              </li>
+            `;
+          })
+          .join("");
+      } catch (error) {
+        summaryList.innerHTML = '<li class="summary-item summary-item--default">Unable to load summary data.</li>';
+        console.error("Could not load summary data:", error);
+      }
+    }
+
+    renderSummary();
+  </script>
+</body>
 </html>
